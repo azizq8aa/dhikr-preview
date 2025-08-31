@@ -792,12 +792,12 @@
                     completed: d.completed
                 }));
             });
-            localStorage.setItem('dhikrProgress_v6', JSON.stringify(progress));
+            localStorage.setItem('dhikrProgress_v7', JSON.stringify(progress));
         }
 
         function loadProgress() {
             try {
-                const savedProgress = localStorage.getItem('dhikrProgress_v6');
+                const savedProgress = localStorage.getItem('dhikrProgress_v7');
                 if (savedProgress) {
                     const progress = JSON.parse(savedProgress);
                     Object.keys(progress).forEach(mode => {
@@ -816,21 +816,51 @@
             }
         }
 
-        // نظام التذكير
+        // نظام التذكير المُحسن
+        function checkNotificationSupport() {
+            return 'Notification' in window;
+        }
+
         function requestNotificationPermission() {
-            if ('Notification' in window && Notification.permission === 'default') {
-                Notification.requestPermission();
+            if (!checkNotificationSupport()) {
+                alert('متصفحك لا يدعم الإشعارات. جرب متصفحًا آخر مثل Chrome أو Firefox.');
+                return Promise.resolve('denied');
             }
+
+            if (Notification.permission === 'granted') {
+                return Promise.resolve('granted');
+            }
+
+            if (Notification.permission === 'denied') {
+                alert('الإشعارات محظورة. يرجى تفعيلها من إعدادات المتصفح.');
+                return Promise.resolve('denied');
+            }
+
+            return Notification.requestPermission();
         }
 
         function showNotification(title, body) {
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification(title, {
-                    body: body,
-                    icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiM0QTkwRTIiLz4KPHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDJDOC4yNjggMiAyIDguMjY4IDIgMTZTOC4yNjggMzAgMTYgMzAgMzAgMjMuNzMyIDMwIDE2UzIzLjczMiAyIDE2IDJaTTE2IDI2QzEwLjQ4NiAyNiA2IDIxLjUxNCA2IDE2UzEwLjQ4NiA2IDE2IDYgMjYgMTAuNDg2IDI2IDE2UzIxLjUxNCAyNiAxNiAyNloiIGZpbGw9IndoaXRlIi8+CjwvZz4KPC9zdmc+',
-                    badge: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiM0QTkwRTIiLz4KPHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDJDOC4yNjggMiAyIDguMjY4IDIgMTZTOC4yNjggMzAgMTYgMzAgMzAgMjMuNzMyIDMwIDE2UzIzLjczMiAyIDE2IDJaTTE2IDI2QzEwLjQ4NiAyNiA2IDIxLjUxNCA2IDE2UzEwLjQ4NiA2IDE2IDYgMjYgMTAuNDg2IDI2IDE2UzIxLjUxNCAyNiAxNiAyNloiIGZpbGw9IndoaXRlIi8+CjwvZz4KPC9zdmc+'
-                });
+            if (checkNotificationSupport() && Notification.permission === 'granted') {
+                try {
+                    const notification = new Notification(title, {
+                        body: body,
+                        icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiM0QTkwRTIiLz4KPHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDJDOC4yNjggMiAyIDguMjY4IDIgMTZTOC4yNjggMzAgMTYgMzAgMzAgMjMuNzMyIDMwIDE2UzIzLjczMiAyIDE2IDJaTTE2IDI2QzEwLjQ4NiAyNiA2IDIxLjUxNCA2IDE2UzEwLjQ4NiA2IDE2IDYgMjYgMTAuNDg2IDI2IDE2UzIxLjUxNCAyNiAxNiAyNloiIGZpbGw9IndoaXRlIi8+CjwvZz4KPC9zdmc+',
+                        requireInteraction: false,
+                        silent: false
+                    });
+
+                    // إغلاق الإشعار تلقائيًا بعد 5 ثوانٍ
+                    setTimeout(() => {
+                        notification.close();
+                    }, 5000);
+
+                    return true;
+                } catch (error) {
+                    console.error('خطأ في إظهار الإشعار:', error);
+                    return false;
+                }
             }
+            return false;
         }
 
         function setReminder(time) {
@@ -844,14 +874,20 @@
                 const now = new Date();
                 const currentHours = now.getHours();
                 const currentMinutes = now.getMinutes();
+                const currentSeconds = now.getSeconds();
                 
-                if (currentHours === hours && currentMinutes === minutes) {
-                    showNotification('🕌 تذكير الأذكار', 'حان وقت قراءة الأذكار. بارك الله فيك!');
+                // فحص دقيق للوقت (فقط في الثانية الأولى من الدقيقة المحددة)
+                if (currentHours === hours && currentMinutes === minutes && currentSeconds === 0) {
+                    const success = showNotification('🕌 تذكير الأذكار', 'حان وقت قراءة الأذكار. بارك الله فيك!');
+                    if (!success) {
+                        // إذا فشل الإشعار، أظهر تنبيه عادي
+                        alert('🕌 تذكير الأذكار\nحان وقت قراءة الأذكار. بارك الله فيك!');
+                    }
                 }
             }
 
-            // فحص كل دقيقة
-            reminderInterval = setInterval(checkTime, 60000);
+            // فحص كل ثانية للدقة
+            reminderInterval = setInterval(checkTime, 1000);
             
             // حفظ الوقت
             localStorage.setItem('dhikrReminderTime', time);
@@ -877,10 +913,12 @@
                 statusElement.textContent = `✅ التذكير مفعل يوميًا في ${time}`;
                 setBtn.style.display = 'none';
                 stopBtn.style.display = 'inline-block';
+                stopBtn.classList.add('active');
             } else {
                 statusElement.textContent = 'اختر وقتًا لتفعيل التذكير اليومي';
                 setBtn.style.display = 'inline-block';
                 stopBtn.style.display = 'none';
+                stopBtn.classList.remove('active');
             }
         }
 
@@ -978,7 +1016,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadProgress();
             displayDhikr();
-            requestNotificationPermission();
             
             // استرجاع التذكير المحفوظ
             const savedTime = localStorage.getItem('dhikrReminderTime');
@@ -988,11 +1025,19 @@
             }
 
             // أحداث التذكير
-            document.getElementById('set-reminder-btn').addEventListener('click', () => {
+            document.getElementById('set-reminder-btn').addEventListener('click', async () => {
                 const time = document.getElementById('reminder-time').value;
                 if (time) {
-                    requestNotificationPermission();
-                    setReminder(time);
+                    const permission = await requestNotificationPermission();
+                    if (permission === 'granted') {
+                        setReminder(time);
+                        // إظهار إشعار تجريبي
+                        setTimeout(() => {
+                            showNotification('✅ تم تفعيل التذكير', `سيتم تذكيرك يوميًا في ${time}`);
+                        }, 1000);
+                    } else {
+                        alert('لا يمكن تفعيل التذكير بدون إذن الإشعارات. يرجى تفعيل الإشعارات من إعدادات المتصفح.');
+                    }
                 } else {
                     alert('يرجى اختيار وقت للتذكير');
                 }
@@ -1001,6 +1046,7 @@
             document.getElementById('stop-reminder-btn').addEventListener('click', () => {
                 stopReminder();
                 document.getElementById('reminder-time').value = '';
+                showNotification('⏹️ تم إيقاف التذكير', 'تم إيقاف التذكير اليومي بنجاح');
             });
 
             // زر إعادة الضبط
