@@ -6,7 +6,7 @@
     <title>أذكار المسلم</title>
     <style>
         :root {
-            --bg-morning: linear-gradient(135deg, #89CFF0 0%, #B6E2F3 100%);
+            --bg-morning: linear-gradient(135deg, #2C5F2D 0%, #4A7C59 100%);
             --bg-evening: linear-gradient(135deg, #2C3E50 0%, #4A6E8A 100%);
             --bg-sleep: linear-gradient(135deg, #1C2833 0%, #34495E 100%);
             --bg-baqiyat: linear-gradient(135deg, #005C97 0%, #363795 100%);
@@ -86,6 +86,63 @@
         
         .btn.active {
             border-color: var(--btn-active-border);
+        }
+        
+        .reminder-section {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .reminder-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        .time-input {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-color);
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .time-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .reminder-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            background: rgba(52, 152, 219, 0.8);
+            color: white;
+        }
+        
+        .reminder-btn:hover {
+            background: rgba(52, 152, 219, 1);
+        }
+        
+        .reminder-btn.active {
+            background: rgba(46, 204, 113, 0.8);
+        }
+        
+        .reminder-status {
+            font-size: 12px;
+            margin-top: 5px;
+            opacity: 0.8;
         }
         
         .dhikr-grid {
@@ -194,6 +251,16 @@
                 <button class="btn" onclick="showSection('sleep', this)">أذكار النوم</button>
                 <button class="btn" onclick="showSection('baqiyat', this)">الباقيات الصالحات</button>
             </div>
+        </div>
+
+        <div class="reminder-section">
+            <h3>🔔 تذكير الأذكار</h3>
+            <div class="reminder-controls">
+                <input type="time" id="reminder-time" class="time-input" placeholder="اختر الوقت">
+                <button id="set-reminder-btn" class="reminder-btn">تفعيل التذكير</button>
+                <button id="stop-reminder-btn" class="reminder-btn" style="display: none;">إيقاف التذكير</button>
+            </div>
+            <div id="reminder-status" class="reminder-status">اختر وقتًا لتفعيل التذكير اليومي</div>
         </div>
 
         <div id="dhikr-container" class="dhikr-grid">
@@ -714,6 +781,7 @@
 
         // المتغيرات العامة
         let currentMode = 'morning';
+        let reminderInterval = null;
 
         // وظائف حفظ واسترجاع البيانات
         function saveProgress() {
@@ -724,12 +792,12 @@
                     completed: d.completed
                 }));
             });
-            localStorage.setItem('dhikrProgress_v5', JSON.stringify(progress));
+            localStorage.setItem('dhikrProgress_v6', JSON.stringify(progress));
         }
 
         function loadProgress() {
             try {
-                const savedProgress = localStorage.getItem('dhikrProgress_v5');
+                const savedProgress = localStorage.getItem('dhikrProgress_v6');
                 if (savedProgress) {
                     const progress = JSON.parse(savedProgress);
                     Object.keys(progress).forEach(mode => {
@@ -745,6 +813,74 @@
                 }
             } catch (e) {
                 console.error("Failed to load progress:", e);
+            }
+        }
+
+        // نظام التذكير
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
+        function showNotification(title, body) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: body,
+                    icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiM0QTkwRTIiLz4KPHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDJDOC4yNjggMiAyIDguMjY4IDIgMTZTOC4yNjggMzAgMTYgMzAgMzAgMjMuNzMyIDMwIDE2UzIzLjczMiAyIDE2IDJaTTE2IDI2QzEwLjQ4NiAyNiA2IDIxLjUxNCA2IDE2UzEwLjQ4NiA2IDE2IDYgMjYgMTAuNDg2IDI2IDE2UzIxLjUxNCAyNiAxNiAyNloiIGZpbGw9IndoaXRlIi8+CjwvZz4KPC9zdmc+',
+                    badge: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiM0QTkwRTIiLz4KPHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE2IDJDOC4yNjggMiAyIDguMjY4IDIgMTZTOC4yNjggMzAgMTYgMzAgMzAgMjMuNzMyIDMwIDE2UzIzLjczMiAyIDE2IDJaTTE2IDI2QzEwLjQ4NiAyNiA2IDIxLjUxNCA2IDE2UzEwLjQ4NiA2IDE2IDYgMjYgMTAuNDg2IDI2IDE2UzIxLjUxNCAyNiAxNiAyNloiIGZpbGw9IndoaXRlIi8+CjwvZz4KPC9zdmc+'
+                });
+            }
+        }
+
+        function setReminder(time) {
+            if (reminderInterval) {
+                clearInterval(reminderInterval);
+            }
+
+            const [hours, minutes] = time.split(':').map(Number);
+            
+            function checkTime() {
+                const now = new Date();
+                const currentHours = now.getHours();
+                const currentMinutes = now.getMinutes();
+                
+                if (currentHours === hours && currentMinutes === minutes) {
+                    showNotification('🕌 تذكير الأذكار', 'حان وقت قراءة الأذكار. بارك الله فيك!');
+                }
+            }
+
+            // فحص كل دقيقة
+            reminderInterval = setInterval(checkTime, 60000);
+            
+            // حفظ الوقت
+            localStorage.setItem('dhikrReminderTime', time);
+            
+            updateReminderStatus(time);
+        }
+
+        function stopReminder() {
+            if (reminderInterval) {
+                clearInterval(reminderInterval);
+                reminderInterval = null;
+            }
+            localStorage.removeItem('dhikrReminderTime');
+            updateReminderStatus(null);
+        }
+
+        function updateReminderStatus(time) {
+            const statusElement = document.getElementById('reminder-status');
+            const setBtn = document.getElementById('set-reminder-btn');
+            const stopBtn = document.getElementById('stop-reminder-btn');
+            
+            if (time) {
+                statusElement.textContent = `✅ التذكير مفعل يوميًا في ${time}`;
+                setBtn.style.display = 'none';
+                stopBtn.style.display = 'inline-block';
+            } else {
+                statusElement.textContent = 'اختر وقتًا لتفعيل التذكير اليومي';
+                setBtn.style.display = 'inline-block';
+                stopBtn.style.display = 'none';
             }
         }
 
@@ -838,20 +974,44 @@
             displayDhikr();
         };
 
-        // زر إعادة الضبط
-        document.getElementById('reset-all-btn').addEventListener('click', () => {
-            dhikrData[currentMode].forEach(dhikr => {
-                dhikr.currentCount = 0;
-                dhikr.completed = false;
-            });
-            saveProgress();
-            displayDhikr();
-        });
-
         // التحميل الأولي
         document.addEventListener('DOMContentLoaded', () => {
             loadProgress();
             displayDhikr();
+            requestNotificationPermission();
+            
+            // استرجاع التذكير المحفوظ
+            const savedTime = localStorage.getItem('dhikrReminderTime');
+            if (savedTime) {
+                document.getElementById('reminder-time').value = savedTime;
+                setReminder(savedTime);
+            }
+
+            // أحداث التذكير
+            document.getElementById('set-reminder-btn').addEventListener('click', () => {
+                const time = document.getElementById('reminder-time').value;
+                if (time) {
+                    requestNotificationPermission();
+                    setReminder(time);
+                } else {
+                    alert('يرجى اختيار وقت للتذكير');
+                }
+            });
+
+            document.getElementById('stop-reminder-btn').addEventListener('click', () => {
+                stopReminder();
+                document.getElementById('reminder-time').value = '';
+            });
+
+            // زر إعادة الضبط
+            document.getElementById('reset-all-btn').addEventListener('click', () => {
+                dhikrData[currentMode].forEach(dhikr => {
+                    dhikr.currentCount = 0;
+                    dhikr.completed = false;
+                });
+                saveProgress();
+                displayDhikr();
+            });
         });
     </script>
 </body>
