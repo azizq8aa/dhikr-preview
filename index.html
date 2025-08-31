@@ -54,17 +54,7 @@
         .reset-btn { background: rgba(255, 82, 82, 0.7); border: none; color: white; padding: 12px 28px; font-size: 1rem; border-radius: 25px; cursor: pointer; transition: all 0.3s ease; }
         .reset-btn:hover { background: rgba(255, 82, 82, 1); transform: translateY(-2px); }
         
-        .reminder-section { background: var(--card-bg); padding: 20px; border-radius: 15px; margin-top: 20px; text-align: center; }
-        .reminder-section h2 { margin-bottom: 15px; font-size: 1.2rem; }
-        .reminder-controls { display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap; }
-        #reminder-time { padding: 10px; border-radius: 10px; border: 1px solid #FFF; background: rgba(0,0,0,0.2); color: white; }
-        #save-reminder-btn, #cancel-reminder-btn { font-size: 14px; }
-        #save-reminder-btn { background: #27ae60; }
-        #cancel-reminder-btn { background: #c0392b; }
-        #reminder-status { margin-top: 15px; font-size: 0.9rem; font-style: italic; }
-
         .footer-prayer { text-align: center; margin-top: 30px; padding: 15px; background: rgba(0, 0, 0, 0.1); border-radius: 10px; font-style: italic; font-size: 0.9rem; }
-        .hidden { display: none; }
     </style>
 </head>
 <body class="morning">
@@ -85,16 +75,6 @@
 
         <div class="reset-container">
             <button class="reset-btn" id="reset-all-btn">🔄 إعادة ضبط العدادات</button>
-        </div>
-
-        <div class="reminder-section">
-            <h2>ضبط التذكير اليومي</h2>
-            <div class="reminder-controls">
-                <input type="time" id="reminder-time" class="btn">
-                <button id="save-reminder-btn" class="btn">حفظ التذكير</button>
-                <button id="cancel-reminder-btn" class="btn">إلغاء</button>
-            </div>
-            <p id="reminder-status"></p>
         </div>
 
         <div class="footer-prayer">
@@ -167,4 +147,10 @@
                 { text: "بِاسْـمِكَ اللّهُـمَّ أَمـوتُ وَأَحْـيا.", source: "مرة واحدة", count: 1 },
                 { text: "الـحَمْدُ للهِ الَّذي أَطْـعَمَنا وَسَقـانا، وَكَفـانا، وَآوانا، فَكَـمْ مِمَّـنْ لا كـافِيَ لَـهُ وَلا مُـؤْوي.", source: "مرة واحدة", count: 1 },
                 { text: "اللّهُـمَّ عالِـمَ الغَـيبِ وَالشّـهادةِ فاطِـرَ السّماواتِ وَالأرْضِ رَبَّ كُـلِّ شَـيءٍ وَمَليـكَه، أَشْهـدُ أَنْ لا إِلـهَ إِلاّ أَنْت، أَعـوذُ بِكَ مِن شَـرِّ نَفْسـي، وَمِن شَـرِّ الشَّيْـطانِ وَشِـرْكِه، وَأَنْ أَقْتَـرِفَ عَلـى نَفْسـي سوءاً أَوْ أَجُـرَّهُ إِلـى مُسْـلِم.", source: "مرة واحدة", count: 1 },
-                { text: "اللّهُـمَّ أَسْـلَمْتُ نَفْـسي إِلَـيْكَ، وَفَوَّضْـتُ أَمْـري إِلَـيْكَ
+                { text: "اللّهُـمَّ أَسْـلَمْتُ نَفْـسي إِلَـيْكَ، وَفَوَّضْـتُ أَمْـري إِلَـيْكَ، وَوَجَّـهْتُ وَجْـهي إِلَـيْكَ، وَأَلْـجَـاْتُ ظَهـري إِلَـيْكَ، رَغْبَـةً وَرَهْـبَةً إِلَـيْكَ، لا مَلْجَـأَ وَلا مَنْـجـا مِنْـكَ إِلاّ إِلَـيْكَ، آمَنْـتُ بِكِتـابِكَ الّـذي أَنْزَلْـتَ وَبِنَبِـيِّـكَ الّـذي أَرْسَلْـت.", source: "مرة واحدة", count: 1 },
+                { text: "سُبْحَانَ اللَّهِ.", source: "33 مرة", count: 33 },
+                { text: "الْحَمْدُ لِلَّهِ.", source: "33 مرة", count: 33 },
+                { text: "اللَّهُ أَكْبَرُ.", source: "34 مرة", count: 34 },
+                { text: "يجمع كفيه ثم ينفث فيهما والقراءة فيهما:\nقُلْ هُوَ اللَّهُ أَحَدٌ، قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ، قُلْ أَعُوذُ بِرَبِّ النَّاسِ.\nويمسح بهما ما استطاع من جسده.", source: "3 مرات", count: 3 },
+                { text: "آمَنَ الرَّسُولُ بِمَا أُنْزِلَ إِلَيْهِ مِنْ رَبِّهِ وَالْمُؤْمِنُونَ... (إلى آخر السورة)", source: "سورة البقرة (285-286) | من قرأهما في ليلة كفتاه", count: 1 },
+                { text:
